@@ -2,16 +2,22 @@ package com.revature.skate.ui;
 
 
 
+import com.revature.skate.daos.DeckDAO;
+import com.revature.skate.daos.UserDAO;
 import com.revature.skate.models.User;
+import com.revature.skate.services.DecksService;
 import com.revature.skate.services.UserService;
+import com.revature.skate.util.annotations.Inject;
+import com.revature.skate.util.custom_exceptions.InvalidUserException;
 
 import java.util.Scanner;
 import java.util.UUID;
 
 /*This class will ask use to login, signup, or exit*/
 public class StartMenu implements IMenu{
+    @Inject
     private final UserService userService;
-
+    @Inject
     public StartMenu(UserService userService) {
         this.userService = userService;
     }
@@ -58,7 +64,35 @@ public class StartMenu implements IMenu{
         System.out.println("[x] Exit");
     }
     private void login(){
-        System.out.println("NEEDS IMPLEMENTATION...");
+        String username;
+        String password;
+        User user = new User();
+        Scanner scan = new Scanner(System.in);
+
+        while(true) {
+            System.out.println("Logging in...");
+
+            System.out.print("\nEnter Username: ");
+            username = scan.nextLine();
+
+            System.out.print("\nEnter Password: ");
+            password = scan.nextLine();
+
+            try{
+                user = userService.login(username, password);
+
+                if(user.getRole().equals("ADMIN")){
+                    new AdminMenu(user, new DecksService(new DeckDAO())).start();
+                }
+                else {
+                    new MainMenu(user).start();
+                }
+                break;
+            }catch(InvalidUserException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
     }
 
     private void signup(){
@@ -74,35 +108,39 @@ public class StartMenu implements IMenu{
             System.out.print("Enter username: ");
             username = scan.nextLine();
 
-            if(userService.isValidUsername(username)) {
-                System.out.println("Good username!\n");
-                break;
+            try {
+                if (userService.isValidUsername(username)) {
+                    if(userService.isNotDuplicate(username)) {
+                        System.out.println("Good username!\n");
+                        break;
+                    }
+                }
             }
-            else {
-                System.out.println("!!!!Invalid username. Username needs to be 8-20 characters long!!!!");
-            }
+                catch(InvalidUserException e) {
+                    System.out.println(e.getMessage());
+                }
         }
 
-        while(true){
+
+
+        while(true) {
             System.out.print("Enter password: ");
             password = scan.nextLine();
 
-            if(userService.isValidPassword(password)){
-                System.out.print("re-enter password: ");
-                String confirm = scan.nextLine();
-                if(password.equals(confirm)){
-                    System.out.println("Password matches!\n");
-                    break;
+            try {
+                if (userService.isValidPassword(password)) {
+                    System.out.print("re-enter password: ");
+                    String confirm = scan.nextLine();
+                    if (password.equals(confirm)) {
+                        System.out.println("Password matches!\n");
+                        break;
+                    } else {
+                        System.out.println("!!!!Password does not match!!!!\n");
+                    }
                 }
-                else{
-                    System.out.println("!!!!Password does not match!!!!\n");
-                    //break;
                 }
-            }
-            else {
-                System.out.println("!!!!Invalid password. must contain eight characters " +
-                        "one uppercase letter, one lowercase letter, and one number or special character!!!!\n");
-
+            catch(InvalidUserException e){
+                System.out.println(e.getMessage());
             }
         }
         exit:{
@@ -118,6 +156,9 @@ public class StartMenu implements IMenu{
             switch(accValidate) {
                 case "y":
                     User user = new User(UUID.randomUUID().toString(), username, password, "Default");
+
+                    userService.register(user);
+
                     new MainMenu(user).start();
                     break exit;
                 case "n":
