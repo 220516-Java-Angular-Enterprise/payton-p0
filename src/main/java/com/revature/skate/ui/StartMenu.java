@@ -2,10 +2,14 @@ package com.revature.skate.ui;
 
 
 
+import com.revature.skate.daos.CartDAO;
 import com.revature.skate.daos.DeckDAO;
+import com.revature.skate.daos.OrderDAO;
 import com.revature.skate.daos.UserDAO;
 import com.revature.skate.models.User;
+import com.revature.skate.services.CartService;
 import com.revature.skate.services.DecksService;
+import com.revature.skate.services.OrderService;
 import com.revature.skate.services.UserService;
 import com.revature.skate.util.annotations.Inject;
 import com.revature.skate.util.custom_exceptions.InvalidUserException;
@@ -38,7 +42,7 @@ public class StartMenu implements IMenu{
                 switch(input) {
                     case "1":
                         login();
-                        break;
+                        break exit;
                     case "2":
                         signup();
                         break;
@@ -75,7 +79,7 @@ public class StartMenu implements IMenu{
             System.out.print("\nEnter Username: ");
             username = scan.nextLine();
 
-            System.out.print("\nEnter Password: ");
+            System.out.print("Enter Password: ");
             password = scan.nextLine();
 
             try{
@@ -85,7 +89,7 @@ public class StartMenu implements IMenu{
                     new AdminMenu(user, new DecksService(new DeckDAO())).start();
                 }
                 else {
-                    new MainMenu(user).start();
+                    new MainMenu(user, new UserService(new UserDAO()), new OrderService(new OrderDAO()), new DecksService(new DeckDAO()), new CartService(new CartDAO())).start();
                 }
                 break;
             }catch(InvalidUserException e) {
@@ -159,7 +163,7 @@ public class StartMenu implements IMenu{
 
                     userService.register(user);
 
-                    new MainMenu(user).start();
+                    new MainMenu(user, new UserService(new UserDAO()), new OrderService(new OrderDAO()), new DecksService(new DeckDAO()), new CartService(new CartDAO())).start();
                     break exit;
                 case "n":
                     break exit;

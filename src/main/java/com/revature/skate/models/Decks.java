@@ -51,8 +51,9 @@ public class Decks {
 
     @Override
     public String toString() {
-        return "Brand: " + brand +
+        return "\nBrand: " + brand +
                 "\nSize: " + size +
-                "\nPrice: " + price;
+                "\nPrice: " + price +
+                "\n--------------------";
     }
 }
