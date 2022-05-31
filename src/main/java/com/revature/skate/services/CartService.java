@@ -4,6 +4,7 @@ import com.revature.skate.daos.CartDAO;
 import com.revature.skate.models.Cart;
 import com.revature.skate.models.Decks;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class CartService {
@@ -27,5 +28,9 @@ public class CartService {
 
     public List<Double> getTotalByUserId(String id){
         return cartDAO.getTotalByUserId(id);
+    }
+
+    public void deleteCart(String id) {
+            cartDAO.delete(id);
     }
 }

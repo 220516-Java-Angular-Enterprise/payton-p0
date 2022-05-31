@@ -153,8 +153,11 @@ public class MainMenu implements IMenu{
 
         switch(input){
             case "y":
+                System.out.println("\n######################################");
                 System.out.println("Your order is being processed!");
                 System.out.println("Thank you for shopping at Skate House!");
+                System.out.println("######################################");
+                cartService.deleteCart(user.getId());
                 break;
             case"n":
                 break;

@@ -62,8 +62,8 @@ public class Orders {
 
     @Override
     public String toString() {
-        return "\nDate='" + date +
-                "\nTotal=" + total +
+        return "\nDate = " + date +
+                "\nTotal = " + total +
                 "\n--------------------";
     }
 }

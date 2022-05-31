@@ -39,7 +39,14 @@ public class CartDAO implements CrudDAO<Cart> {
 
     @Override
     public void delete(String id) {
+        try {
+            PreparedStatement ps = con.prepareStatement("DELETE FROM carts WHERE users_id = (?)");
+            ps.setString(1, id);
+            ps.executeUpdate();
 
+        }catch(SQLException e){
+            throw new RuntimeException("An error occurred while connecting to database");
+        }
     }
 
     @Override
